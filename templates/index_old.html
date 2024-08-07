@@ -1,0 +1,113 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .video-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .video-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 200px;
+        }
+        .video-thumbnail {
+            width: 100%;
+            height: auto;
+        }
+        .video-title {
+            padding: 8px;
+            font-size: 14px;
+            text-align: center;
+            background: #f4f4f4;
+        }
+        .message {
+            font-size: 18px;
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube Video Search</h1>
+    <div class="search-container">
+        <input type="text" id="search-query" placeholder="Search for videos..." />
+        <select id="language-select">
+            <option value="hi">Hindi</option>
+            <option value="pa">Punjabi</option>
+        </select>
+        <button onclick="fetchVideos()">Search</button>
+    </div>
+    <div id="video-container" class="video-list"></div>
+    <div id="message-container" class="message"></div>
+
+    <script>
+        async function fetchVideos() {
+            const query = document.getElementById('search-query').value.trim();
+            const language = document.getElementById('language-select').value;
+            const messageContainer = document.getElementById('message-container');
+            const container = document.getElementById('video-container');
+            
+            // Clear previous results and message
+            container.innerHTML = '';
+            messageContainer.innerHTML = '';
+
+            // If the search query is empty, display the message and return
+            if (!query) {
+                messageContainer.innerHTML = 'Nothing to display';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?query=${encodeURIComponent(query)}&language=${language}`);
+                const data = await response.json();
+
+                if (data.message) {
+                    console.error(data.message);
+                    if (data.message === "The search query contains harmful keywords. Please modify your search query.") {
+                        messageContainer.innerHTML = "This search is harmful for you";
+                    } else {
+                        messageContainer.innerHTML = data.message;
+                    }
+                    return;
+                }
+
+                if (data.length === 0) {
+                    messageContainer.innerHTML = 'Nothing to display';
+                    return;
+                }
+
+                data.forEach(video => {
+                    const videoElement = document.createElement('div');
+                    videoElement.className = 'video-item';
+                    videoElement.innerHTML = `
+                        <a href="https://www.youtube.com/watch?v=${video.id.videoId}" target="_blank">
+                            <img src="https://img.youtube.com/vi/${video.id.videoId}/default.jpg" alt="${video.snippet.title}" class="video-thumbnail" />
+                            <div class="video-title">${video.snippet.title}</div>
+                        </a>
+                    `;
+                    container.appendChild(videoElement);
+                });
+            } catch (error) {
+                console.error('Error fetching videos:', error);
+                messageContainer.innerHTML = 'Error fetching videos';
+            }
+        }
+
+        // Initial fetch on page load
+        fetchVideos();
+    </script>
+</body>
+</html> -->
