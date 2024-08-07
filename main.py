@@ -65,7 +65,7 @@ async def search_videos(
         'hate', 'racism', 'sexism','sexy', 'pornography', 'explicit', 'sexual', 'adult content',
         'nudity', 'dangerous', 'risky', 'illegal', 'criminal','sex', 'scam', 'harassment',
         'bullying', 'threats', 'intimidation', 'trolling', 'depression', 'suicide',
-        'self-destruction', 'extremist', 'terrorism', 'radicalization', 'hate speech',
+        'self-destruction', 'extremist', 'terrorism', 'radicalization', 'hate speech', 'danger'
     ]
 
     # Check if the search query contains harmful keywords
