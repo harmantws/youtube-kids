@@ -7,16 +7,18 @@ import googleapiclient.discovery
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
+from dotenv import load_dotenv
 import os
+
+load_dotenv() 
 
 app = FastAPI()
 
-API_KEY = ''
+API_KEY = os.environ['Youtube_API']
 SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search'
 
 
 def search_youtube(query: str, language: str, safe_search: str = 'strict') -> dict:
-    print(language)
     try:
         params = {
             'part': 'snippet',
@@ -81,7 +83,7 @@ def filter_videos(videos: dict, harmful_keywords: List[str]) -> List[Video]:
     return filtered_videos
 
 def SafeSearchModel(query):
-    api_key = ""
+    api_key = os.environ['Gemini_API']
     llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=api_key)
 
     prompt_template = PromptTemplate(
@@ -116,6 +118,13 @@ async def search_videos(
         'bullying', 'threats', 'intimidation', 'trolling', 'depression', 'suicide',
         'self-destruction', 'extremist', 'terrorism', 'radicalization', 'hate speech', 'danger'
     ]
+
+    print("----",language)
+
+    if query == 'hi' or query == 'pa':
+        query = query + "| In hindi or punjabi"
+    elif query == 'en':
+        query = query + "| In english"
 
     query = query + "| In hindi or punjabi"
     safe_search_result = SafeSearchModel(query)
