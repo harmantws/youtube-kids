@@ -4,9 +4,10 @@ from typing import Dict
 class VideoSnippet(BaseModel):
     title: str
     description: str
+    thumbnails: dict
 
 class Video(BaseModel):
-    id: Dict[str, str]
+    id: str  # Update this to str if the ID is a string
     snippet: VideoSnippet
 
 class ErrorResponse(BaseModel):

@@ -6,45 +6,112 @@
     <title>YouTube Video Search</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
         }
-        .search-container, .back-button {
-            margin-bottom: 20px;
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        .search-container input, .search-container select, .search-container button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .search-container button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background-color: #0056b3;
         }
         .video-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            justify-content: center;
+            gap: 20px;
         }
         .video-item {
+            background-color: white;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 10px;
             overflow: hidden;
-            width: 200px;
+            width: 250px;
+            transition: transform 0.2s;
+        }
+        .video-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .video-thumbnail {
             width: 100%;
-            height: auto;
+            height: 140px;
+            object-fit: cover;
         }
         .video-title {
-            padding: 8px;
-            font-size: 14px;
+            padding: 10px;
+            font-size: 16px;
             text-align: center;
-            background: #f4f4f4;
+            background: #fafafa;
+            cursor: pointer;
         }
         .message {
             font-size: 18px;
             color: red;
             text-align: center;
             margin-top: 20px;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
         }
         .embedded-video {
             display: none;
             text-align: center;
+            margin-top: 40px;
         }
         .embedded-video iframe {
             width: 560px;
             height: 315px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .next-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .next-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -59,17 +126,17 @@
         <button onclick="fetchVideos()">Search</button>
     </div>
     <div id="video-container" class="video-list"></div>
-    <div id="message-container" class="message"></div>
+    <div id="message-container" class="message" style="display: none;"></div>
     <div id="embedded-video-container" class="embedded-video">
         <button class="back-button" onclick="backToSearch()">Back</button>
         <div id="embedded-video"></div>
-        <button onclick="nextVideo()">Next Video</button>
+        <button class="next-button" onclick="nextVideo()">Next Video</button>
     </div>
 
     <script>
         let currentVideos = [];
         let currentIndex = 0;
-    
+
         async function fetchVideos() {
             const query = document.getElementById('search-query').value.trim();
             const language = document.getElementById('language-select').value;
@@ -83,13 +150,15 @@
             messageContainer.innerHTML = '';
             embeddedVideoContainer.style.display = 'none';
             embeddedVideo.innerHTML = '';
-    
+            messageContainer.style.display = 'none';
+
             // If the search query is empty, display the message and return
             if (!query) {
                 messageContainer.innerHTML = 'Nothing to display';
+                messageContainer.style.display = 'block';
                 return;
             }
-    
+
             try {
                 const response = await fetch(`/search?query=${encodeURIComponent(query)}&language=${language}`);
                 if (!response.ok) {
@@ -97,7 +166,10 @@
                     throw new Error(errorData.detail || 'Error fetching videos');
                 }
                 const data = await response.json();
-    
+
+                // Log the full API response to the console
+                console.log('API Response:', data);
+
                 if (data.message) {
                     console.error(data.message);
                     if (data.message === "The search query contains harmful keywords. Please modify your search query.") {
@@ -105,22 +177,24 @@
                     } else {
                         messageContainer.innerHTML = data.message;
                     }
+                    messageContainer.style.display = 'block';
                     return;
                 }
-    
+
                 if (data.length === 0) {
                     messageContainer.innerHTML = 'Nothing to display';
+                    messageContainer.style.display = 'block';
                     return;
                 }
-    
+
                 currentVideos = data;
                 currentIndex = 0;
-    
+
                 data.forEach((video, index) => {
                     const videoElement = document.createElement('div');
                     videoElement.className = 'video-item';
                     videoElement.innerHTML = `
-                        <img src="https://img.youtube.com/vi/${video.id.videoId}/default.jpg" alt="${video.snippet.title}" class="video-thumbnail" />
+                        <img src="${video.snippet.thumbnails.default.url}" alt="${video.snippet.title}" class="video-thumbnail" />
                         <div class="video-title" onclick="embedVideo(${index})">${video.snippet.title}</div>
                     `;
                     container.appendChild(videoElement);
@@ -129,29 +203,39 @@
                 console.error('Error fetching videos:', error);
                 alert(`Error: ${error.message}`);
                 messageContainer.innerHTML = `Error fetching videos: ${error.message}`;
+                messageContainer.style.display = 'block';
             }
         }
-    
+
         function embedVideo(index) {
             const video = currentVideos[index];
             const embeddedVideoContainer = document.getElementById('embedded-video-container');
             const embeddedVideo = document.getElementById('embedded-video');
-    
+
+            // Log video data for debugging
+            console.log('Selected Video:', video);
+
             currentIndex = index;
-    
-            embeddedVideo.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${video.id.videoId}" frameborder="0" allowfullscreen></iframe>
-                <div>${video.snippet.title}</div>
-            `;
-            embeddedVideoContainer.style.display = 'block';
-            document.getElementById('video-container').style.display = 'none';
+
+            // Use video.id directly
+            if (video.id) {
+                embeddedVideo.innerHTML = `
+                    <iframe src="https://www.youtube.com/embed/${video.id}" frameborder="0" allowfullscreen></iframe>
+                    <div>${video.snippet.title}</div>
+                `;
+                embeddedVideoContainer.style.display = 'block';
+                document.getElementById('video-container').style.display = 'none';
+            } else {
+                console.error('Video ID not found:', video);
+                alert('Video ID not found.');
+            }
         }
-    
+
         function backToSearch() {
             document.getElementById('video-container').style.display = 'flex';
             document.getElementById('embedded-video-container').style.display = 'none';
         }
-    
+
         function nextVideo() {
             currentIndex = (currentIndex + 1) % currentVideos.length;
             embedVideo(currentIndex);
@@ -159,8 +243,3 @@
     </script>    
 </body>
 </html>
-
-
-
-
-
