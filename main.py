@@ -128,7 +128,6 @@ async def search_videos(
     elif query == 'en':
         query = query + "| In english"
 
-    query = query + "| In hindi or punjabi"
     safe_search_result = SafeSearchModel(query)
     if safe_search_result == 'Not Allowed':
         return ErrorResponse(message="This search query is not allowed according to YouTube's safe search policy.")
