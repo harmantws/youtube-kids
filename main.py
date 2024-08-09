@@ -55,7 +55,7 @@ def filter_videos(videos: dict, harmful_keywords: List[str]) -> List[Video]:
     filtered_videos = []
 
     unwanted_languages = [
-        'english', 'french', 'spanish', 'german', 'italian', 'portuguese', 'chinese',
+        'french', 'spanish', 'german', 'italian', 'portuguese', 'chinese',
         'japanese', 'korean', 'russian', 'arabic', 'turkish', 'telugu', 'tamil',
         'bengali', 'gujarati', 'marathi', 'swahili'
     ]
@@ -121,8 +121,10 @@ async def search_videos(
 
     print("----",language)
 
-    if query == 'hi' or query == 'pa':
-        query = query + "| In hindi or punjabi"
+    if query == 'hi':
+        query = query + "| In hindi"
+    elif query == 'pa':
+        query = query + "| In punjabi"
     elif query == 'en':
         query = query + "| In english"
 
