@@ -119,14 +119,14 @@ async def search_videos(
         'self-destruction', 'extremist', 'terrorism', 'radicalization', 'hate speech', 'danger'
     ]
 
-    print("----",language)
+    # print("----",language)
 
-    if query == 'hi':
-        query = query + "| In hindi"
-    elif query == 'pa':
-        query = query + "| In punjabi"
-    elif query == 'en':
-        query = query + "| In english"
+    # if query == 'hi':
+    #     query = query + "| In hindi"
+    # elif query == 'pa':
+    #     query = query + "| In punjabi"
+    # elif query == 'en':
+    #     query = query + "| In english"
 
     safe_search_result = SafeSearchModel(query)
     if safe_search_result == 'Not Allowed':
