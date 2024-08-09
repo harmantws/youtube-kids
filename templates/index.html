@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,10 +12,12 @@
             margin: 0;
             padding: 20px;
         }
+
         h1 {
             text-align: center;
             color: #333;
         }
+
         .search-container {
             display: flex;
             justify-content: center;
@@ -22,26 +25,33 @@
             gap: 10px;
             margin-bottom: 40px;
         }
-        .search-container input, .search-container select, .search-container button {
+
+        .search-container input,
+        .search-container select,
+        .search-container button {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
         }
+
         .search-container button {
             background-color: #007BFF;
             color: white;
             cursor: pointer;
         }
+
         .search-container button:hover {
             background-color: #0056b3;
         }
+
         .video-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
         }
+
         .video-item {
             background-color: white;
             border: 1px solid #ddd;
@@ -50,15 +60,18 @@
             width: 250px;
             transition: transform 0.2s;
         }
+
         .video-item:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .video-thumbnail {
             width: 100%;
             height: 140px;
             object-fit: cover;
         }
+
         .video-title {
             padding: 10px;
             font-size: 16px;
@@ -66,6 +79,7 @@
             background: #fafafa;
             cursor: pointer;
         }
+
         .message {
             font-size: 18px;
             color: red;
@@ -77,11 +91,13 @@
             border: 1px solid #f5c6cb;
             border-radius: 5px;
         }
+
         .embedded-video {
             display: none;
             text-align: center;
             margin-top: 40px;
         }
+
         .embedded-video iframe {
             width: 560px;
             height: 315px;
@@ -89,6 +105,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         .back-button {
             background-color: #007BFF;
             color: white;
@@ -98,9 +115,11 @@
             cursor: pointer;
             margin-bottom: 20px;
         }
+
         .back-button:hover {
             background-color: #0056b3;
         }
+
         .next-button {
             background-color: #28a745;
             color: white;
@@ -110,22 +129,27 @@
             cursor: pointer;
             margin-top: 20px;
         }
+
         .next-button:hover {
             background-color: #218838;
         }
     </style>
 </head>
+
 <body>
-    <h1>YouTube Video Search</h1>
-    <div class="search-container">
-        <input type="text" id="search-query" placeholder="Search for videos..." />
-        <select id="language-select">
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-            <option value="pa">Punjabi</option>
-        </select>
-        <button onclick="fetchVideos()">Search</button>
-    </div>
+    <form onsubmit="fetchVideos()">
+
+        <h1>YouTube Video Search</h1>
+        <div class="search-container">
+            <input type="text" id="search-query" placeholder="Search for videos..." />
+            <select id="language-select">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="pa">Punjabi</option>
+            </select>
+            <button type="submit">Search</button>
+        </div>
+    </form>
     <div id="video-container" class="video-list"></div>
     <div id="message-container" class="message" style="display: none;"></div>
     <div id="embedded-video-container" class="embedded-video">
@@ -139,13 +163,15 @@
         let currentIndex = 0;
 
         async function fetchVideos() {
+            event.preventDefault();
+
             const query = document.getElementById('search-query').value.trim();
             const language = document.getElementById('language-select').value;
             const messageContainer = document.getElementById('message-container');
             const container = document.getElementById('video-container');
             const embeddedVideoContainer = document.getElementById('embedded-video-container');
             const embeddedVideo = document.getElementById('embedded-video');
-            
+
             // Clear previous results and message
             container.innerHTML = '';
             messageContainer.innerHTML = '';
@@ -241,6 +267,7 @@
             currentIndex = (currentIndex + 1) % currentVideos.length;
             embedVideo(currentIndex);
         }
-    </script>    
+    </script>
 </body>
+
 </html>
