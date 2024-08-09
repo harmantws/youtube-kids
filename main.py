@@ -79,7 +79,7 @@ def filter_videos(videos: dict) -> List[Video]:
 
 def SafeSearchModel(query: str) -> str:
     api_key = os.environ['Gemini_API']
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", api_key=api_key)
+    llm = ChatGoogleGenerativeAI(model="gemini-1.0-pro", api_key=api_key)
 
     prompt_template = PromptTemplate(
         input_variables=["query"],
