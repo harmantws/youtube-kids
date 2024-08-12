@@ -40,51 +40,25 @@ def search_youtube(query: str, language: str) -> dict:
         print(f"Unexpected error: {e}")
         return {"error": str(e)}
 
-
-# def contains_harmful_keywords(text: str, harmful_keywords: List[str]) -> bool:
-#     return any(keyword in text.lower() for keyword in harmful_keywords)
-
-# def contains_allowed_categories(text: str) -> bool:
-#     allowed_categories = [
-#         'story', 'motivational', 'poem', 'cartoon', 'educational', 'tutorial',
-#         'technology'
-#     ]
-#     text = text.lower()
-#     return any(category in text for category in allowed_categories)
-
-
-def filter_videos(videos: dict) -> List[Video]:
-    filtered_videos = []
-
-    for video in videos.get('items', []):
-        video_id = video['id']['videoId']
-        title = video['snippet']['title']
-        description = video['snippet']['description']
-        thumbnails = video['snippet']['thumbnails']
-
-        # if not contains_allowed_categories(title) and \
-        #    not contains_allowed_categories(description):
-        #     continue
-
-        # if not contains_harmful_keywords(title, harmful_keywords) and \
-        #    not contains_harmful_keywords(description, harmful_keywords):
-        filtered_videos.append(
-            Video(id=video_id,
-                  snippet=VideoSnippet(title=title,
-                                       description=description,
-                                       thumbnails=thumbnails)))
-
-    return filtered_videos
-
-
 def SafeSearchModel(query: str) -> str:
     api_key = os.environ['Gemini_API']
     llm = ChatGoogleGenerativeAI(model="gemini-1.0-pro", api_key=api_key)
 
     prompt_template = PromptTemplate(
         input_variables=["query"],
-        template=
-        "Determine if the following text is related to allowed categories only like stories, motivational videos, poems, cartoons, or educational videos/tutorials, technology. Respond only with 'yes' if it does and 'no' if it does not.\n\nText: \"{query}\""
+        template=(
+            "You are an AI assistant that helps determine the appropriateness of search queries. "
+            "The text provided should only relate to specific categories such as:\n"
+            "- Motivational content\n"
+            "- Educational videos or tutorials\n"
+            "- Technology-related content\n"
+            "- Stories or poems\n"
+            "- Spiritual content\n"
+            "- Cartoons\n\n"
+            "If the text is related to these categories, respond with 'yes.' If it is unrelated or includes "
+            "inappropriate content, respond with 'no.'\n\n"
+            "Here is the text to evaluate:\n\"{query}\""
+        )
     )
     formatted_prompt = prompt_template.format(query=query)
 
@@ -107,17 +81,6 @@ async def search_videos(
             description="Language code (e.g., 'hi' for Hindi, 'pa' for Punjabi)"
         )):
 
-    # harmful_keywords = [
-    #     'violence', 'abuse', 'assault', 'blood', 'torture', 'murder', 'fight',
-    #     'gore', 'self-harm', 'cruelty', 'drugs', 'alcohol', 'addiction',
-    #     'narcotics', 'overdose', 'hate', 'racism', 'sexism', 'sexy',
-    #     'pornography', 'explicit', 'sexual', 'adult content', 'nudity',
-    #     'dangerous', 'risky', 'illegal', 'criminal', 'sex', 'scam',
-    #     'harassment', 'bullying', 'threats', 'intimidation', 'trolling',
-    #     'depression', 'suicide', 'self-destruction', 'extremist', 'terrorism',
-    #     'radicalization', 'hate speech', 'danger'
-    # ]
-
     query = query.lower()
     safe_search_result = SafeSearchModel(query)
     if safe_search_result == 'Not Allowed':
@@ -126,10 +89,7 @@ async def search_videos(
             "This search query is not allowed according to YouTube's policy.")
     else:
         search_results = search_youtube(query, language)
-
-    safe_videos = filter_videos(search_results)
-    return safe_videos
-
+        return search_results
 
 @app.get("/", response_class=HTMLResponse)
 async def read_index():
